@@ -5,7 +5,6 @@ const microCors = require('micro-cors')
 const fetch = require('node-fetch')
 
 const allowHeaders = [
-  'accept-encoding',
   'accept-language',
   'accept',
   'access-control-allow-origin',
@@ -127,6 +126,9 @@ module.exports = ({ origin, insecure_origins = [], authorization = noop } = {}) 
       {
         method: req.method,
         redirect: 'manual',
+        // Never decode the upstream body: the upstream host is caller-chosen, so decoding would run
+        // zlib/Brotli on attacker-controlled bytes in this process.
+        compress: false,
         headers,
         body: (req.method !== 'GET' && req.method !== 'HEAD') ? req : undefined
       }
